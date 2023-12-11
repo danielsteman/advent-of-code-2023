@@ -1,5 +1,7 @@
+use std::fs::read_to_string;
+
 fn main() {
-    let cases = vec!["1abc2", "pqr3stu8vwx", "a1b2c3d4e5f", "treb7uchet"];
+    let cases = read_lines("src/input.txt");
     let mut total_sum = 0;
     for case in cases {
         if let Some(digits) = get_first_and_last_digit(String::from(case)) {
@@ -15,6 +17,16 @@ fn main() {
         }
     }
     println!("total sum: {}", total_sum)
+}
+
+fn read_lines(filename: &str) -> Vec<String> {
+    let mut result = Vec::new();
+
+    for line in read_to_string(filename).unwrap().lines() {
+        result.push(line.to_string())
+    }
+
+    result
 }
 
 struct FirstLastDigits {
