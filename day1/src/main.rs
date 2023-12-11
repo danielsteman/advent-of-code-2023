@@ -3,7 +3,8 @@ use std::fs::read_to_string;
 fn main() {
     let cases = read_lines("src/input.txt");
     let mut total_sum = 0;
-    for case in cases {
+
+    for case in &cases {
         if let Some(digits) = get_first_and_last_digit(String::from(case)) {
             println!("first digit: {}", digits.first_digit);
             println!("last digit: {}", digits.last_digit);
@@ -16,7 +17,11 @@ fn main() {
             println!("no first and/or last digit found")
         }
     }
+
     println!("total sum: {}", total_sum)
+
+    // let set = vec!["one", "two", "three", "four", "five", "six", "seven", "eight", "nine"];
+    // let s = "hoihoionehoitwohoifour";
 }
 
 fn read_lines(filename: &str) -> Vec<String> {
