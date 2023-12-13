@@ -1,37 +1,59 @@
-use std::{collections::HashSet, fs::read_to_string};
+use std::{
+    collections::{HashMap, HashSet},
+    fs::read_to_string,
+};
 
 fn main() {
     let cases = read_lines("src/input.txt");
     let mut total_sum = 0;
 
+    let mapping = HashMap::from([
+        ("one", "1"),
+        ("two", "2"),
+        ("three", "3"),
+        ("four", "4"),
+        ("five", "5"),
+        ("six", "6"),
+        ("seven", "7"),
+        ("eight", "8"),
+        ("nine", "9"),
+        ("zero", "0"),
+    ]);
+
+    let keys_set: HashSet<&str> = mapping.keys().cloned().collect();
+    let values_set: HashSet<&str> = mapping.values().cloned().collect();
+    let combined_set: HashSet<&str> = keys_set.union(&values_set).cloned().collect();
+
     for case in &cases {
-        if let Some(digits) = get_first_and_last_digit(String::from(case)) {
-            // println!("first digit: {}", digits.first_digit);
-            // println!("last digit: {}", digits.last_digit);
-            let result = digits.sum();
-            match result {
-                Ok(sum) => total_sum = total_sum + sum,
-                Err(_) => println!("couldn't parse sum"),
+        let mut first = find_first_occurrence(&combined_set, case);
+        let mut last = find_last_occurrence(&combined_set, case);
+
+        if let Some(first_str) = first {
+            if keys_set.contains(first_str) {
+                first = mapping.get(first_str).copied();
             }
-        } else {
-            // println!("no first and/or last digit found")
         }
+
+        if let Some(last_str) = last {
+            if keys_set.contains(last_str) {
+                last = mapping.get(last_str).copied();
+            }
+        }
+
+        let sum = match (first, last) {
+            (Some(s1), Some(s2)) => Some(format!("{}{}", s1, s2).parse::<i32>()),
+            _ => None,
+        };
+
+        let sum_as_i32 = match sum {
+            Some(Ok(value)) => value,
+            _ => -1,
+        };
+
+        total_sum = total_sum + sum_as_i32
     }
 
     println!("total sum: {}", total_sum);
-
-    let set: HashSet<&str> = [
-        "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "one", "two", "three", "four", "five",
-        "six", "seven", "eight", "nine", "zero",
-    ]
-    .iter()
-    .cloned()
-    .collect();
-
-    let s = "sdgionsodgn9asfoiafknasfpas0asfpiasjhf8";
-    // println!("{:?}", s.rfind("two"))
-    println!("{:?}", find_first_occurrence(&set, s));
-    println!("{:?}", find_last_occurrence(&set, s));
 }
 
 fn find_first_occurrence<'a>(set: &HashSet<&'a str>, input_string: &'a str) -> Option<&'a str> {
@@ -88,27 +110,4 @@ fn read_lines(filename: &str) -> Vec<String> {
     }
 
     result
-}
-
-struct FirstLastDigits {
-    first_digit: i32,
-    last_digit: i32,
-}
-
-impl FirstLastDigits {
-    fn sum(&self) -> Result<i32, std::num::ParseIntError> {
-        let concatenated = format!("{}{}", &self.first_digit, &self.last_digit);
-        let sum = concatenated.parse::<i32>()?;
-        Ok(sum)
-    }
-}
-
-fn get_first_and_last_digit(s: String) -> Option<FirstLastDigits> {
-    let first_digit = s.chars().clone().find(|c| c.is_ascii_digit())?;
-    let last_digit = s.chars().clone().rev().find(|c| c.is_ascii_digit())?;
-
-    Some(FirstLastDigits {
-        first_digit: first_digit as i32 - '0' as i32,
-        last_digit: last_digit as i32 - '0' as i32,
-    })
 }
