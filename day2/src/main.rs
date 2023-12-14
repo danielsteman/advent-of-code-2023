@@ -9,6 +9,14 @@ fn main() {
 
     let sets = get_sets(s);
     println!("sets: {:?}", sets);
+
+    let game = Game::new(s);
+    println!("game: {:?}", game);
+
+    let rules = HashMap::from([("red", 12), ("green", 13), ("blue", 14)]);
+    println!("rules: {:?}", rules);
+
+    game.is_valid(&rules);
 }
 
 fn get_sets(s: &str) -> Vec<HashMap<&str, &str>> {
@@ -30,10 +38,11 @@ fn get_sets(s: &str) -> Vec<HashMap<&str, &str>> {
     sets
 }
 
-fn get_id(s: &str) -> &str {
+fn get_id(s: &str) -> i32 {
     let parts: Vec<&str> = s.split(":").collect();
     let sub_parts: Vec<&str> = parts[0].split(" ").collect();
-    sub_parts[1]
+    let parsed: i32 = sub_parts[1].parse::<i32>().expect("Couldn't parse");
+    parsed
 }
 
 fn read_lines(filename: &str) -> Vec<String> {
@@ -46,11 +55,37 @@ fn read_lines(filename: &str) -> Vec<String> {
     result
 }
 
+#[derive(Debug)]
 struct Game<'a> {
     id: i32,
     sets: Vec<HashMap<&'a str, &'a str>>,
 }
 
-// impl Game {
-//     fn new(s: &str) -> Game {}
-// }
+impl Game<'_> {
+    fn new(s: &str) -> Game {
+        let id = get_id(s);
+        let sets = get_sets(s);
+
+        Game { id, sets }
+    }
+
+    fn is_valid(&self, rules: &HashMap<&str, i32>) -> &i32 {
+        let mut counter = rules.clone();
+        for (_, value) in counter.iter_mut() {
+            *value = 0;
+        }
+
+        for set in &self.sets {
+            for (key, value) in set.iter() {
+                *counter.entry(key).or_insert(0) += value
+                    .parse::<i32>()
+                    .expect("Couldn't parse number of cubes");
+            }
+            println!("{:?}", set);
+        }
+
+        println!("counter {:?}", counter);
+
+        &self.id
+    }
+}
