@@ -58,7 +58,7 @@ impl Game<'_> {
                 let counter_value = counter.get(key).unwrap();
                 let rule_value = rules.get(key).unwrap();
 
-                if counter_value > rule_value {
+                if *counter_value > *rule_value {
                     println!(
                         "{:?}: {:?} is greater than {:?} which is {:?}",
                         key,
