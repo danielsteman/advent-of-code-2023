@@ -1,48 +1,15 @@
 use std::{collections::HashMap, fs::read_to_string};
 
 fn main() {
-    // let cases = read_lines("src/input.txt");
-    let s = "Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green";
-
-    let id = get_id(s);
-    println!("id: {}", id);
-
-    let sets = get_sets(s);
-    println!("sets: {:?}", sets);
-
-    let game = Game::new(s);
-    println!("game: {:?}", game);
-
     let rules = HashMap::from([("red", 12), ("green", 13), ("blue", 14)]);
-    println!("rules: {:?}", rules);
+    let cases = read_lines("src/input.txt");
+    let mut sum = 0;
 
-    game.is_valid(&rules);
-}
-
-fn get_sets(s: &str) -> Vec<HashMap<&str, &str>> {
-    let parts: Vec<&str> = s.split(": ").collect();
-    let cubes = parts[1].split("; ");
-    let mut sets: Vec<HashMap<&str, &str>> = vec![];
-
-    for part in cubes {
-        let mut map: HashMap<&str, &str> = HashMap::new();
-        for cube in part.split(", ") {
-            let cube_data: Vec<&str> = cube.split(" ").collect();
-            let q = cube_data[0];
-            let color = cube_data[1];
-            map.insert(color, q);
-        }
-        sets.push(map);
+    for case in &cases {
+        sum = sum + Game::new(&case).is_valid(&rules);
     }
 
-    sets
-}
-
-fn get_id(s: &str) -> i32 {
-    let parts: Vec<&str> = s.split(":").collect();
-    let sub_parts: Vec<&str> = parts[0].split(" ").collect();
-    let parsed: i32 = sub_parts[1].parse::<i32>().expect("Couldn't parse");
-    parsed
+    println!("Sum: {}", sum);
 }
 
 fn read_lines(filename: &str) -> Vec<String> {
@@ -63,8 +30,8 @@ struct Game<'a> {
 
 impl Game<'_> {
     fn new(s: &str) -> Game {
-        let id = get_id(s);
-        let sets = get_sets(s);
+        let id = Game::get_id(s);
+        let sets = Game::get_sets(s);
 
         Game { id, sets }
     }
@@ -80,6 +47,11 @@ impl Game<'_> {
                 *counter.entry(key).or_insert(0) += value
                     .parse::<i32>()
                     .expect("Couldn't parse number of cubes");
+
+                if &counter.get(key) > &rules.get(key) {
+                    println!("Violated rules, returning zero.");
+                    return &0;
+                }
             }
             println!("{:?}", set);
         }
@@ -87,5 +59,32 @@ impl Game<'_> {
         println!("counter {:?}", counter);
 
         &self.id
+    }
+
+    fn get_sets(s: &str) -> Vec<HashMap<&str, &str>> {
+        let parts: Vec<&str> = s.split(": ").collect();
+        let cubes = parts[1].split("; ");
+        let mut sets: Vec<HashMap<&str, &str>> = vec![];
+
+        for part in cubes {
+            let mut map: HashMap<&str, &str> = HashMap::new();
+            for cube in part.split(", ") {
+                let cube_data: Vec<&str> = cube.split(" ").collect();
+                let q = cube_data[0];
+                let color = cube_data[1];
+                map.insert(color, q);
+            }
+            sets.push(map);
+        }
+
+        sets
+    }
+
+    fn get_id(s: &str) -> i32 {
+        let parts: Vec<&str> = s.split(":").collect();
+        let sub_parts: Vec<&str> = parts[0].split(" ").collect();
+        let parsed: i32 = sub_parts[1].parse::<i32>().expect("Couldn't parse");
+
+        parsed
     }
 }
