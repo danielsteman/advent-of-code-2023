@@ -6,7 +6,14 @@ fn main() {
     let mut sum = 0;
 
     for case in &cases {
-        sum = sum + Game::new(&case).is_valid(&rules);
+        let game = Game::new(case);
+        let res = game.is_valid(&rules);
+
+        println!("res: {}", res);
+        println!("sum: {}", sum);
+        println!("game id: {}", game.id);
+
+        sum += res;
     }
 
     println!("Sum: {}", sum);
@@ -48,15 +55,26 @@ impl Game<'_> {
                     .parse::<i32>()
                     .expect("Couldn't parse number of cubes");
 
-                if &counter.get(key) > &rules.get(key) {
-                    println!("Violated rules, returning zero.");
+                let counter_value = counter.get(key).unwrap();
+                let rule_value = rules.get(key).unwrap();
+
+                if counter_value > rule_value {
+                    println!(
+                        "{:?}: {:?} is greater than {:?} which is {:?}",
+                        key,
+                        counter_value,
+                        rule_value,
+                        counter_value > rule_value
+                    );
+                    println!("Violated rules, returning zero. Counter: {:?}", counter);
+                    println!("");
                     return &0;
                 }
             }
-            println!("{:?}", set);
+            // println!("{:?}", set);
         }
 
-        println!("counter {:?}", counter);
+        // println!("counter {:?}", counter);
 
         &self.id
     }
