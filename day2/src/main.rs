@@ -9,10 +9,6 @@ fn main() {
         let game = Game::new(case);
         let res = game.is_valid(&rules);
 
-        println!("res: {}", res);
-        println!("sum: {}", sum);
-        println!("game id: {}", game.id);
-
         sum += res;
     }
 
@@ -51,30 +47,19 @@ impl Game<'_> {
 
         for set in &self.sets {
             for (key, value) in set.iter() {
-                *counter.entry(key).or_insert(0) += value
+                let parsed_value = value
                     .parse::<i32>()
                     .expect("Couldn't parse number of cubes");
 
-                let counter_value = counter.get(key).unwrap();
+                // let counter_value = counter.get(key).unwrap();
                 let rule_value = rules.get(key).unwrap();
 
-                if *counter_value > *rule_value {
-                    println!(
-                        "{:?}: {:?} is greater than {:?} which is {:?}",
-                        key,
-                        counter_value,
-                        rule_value,
-                        counter_value > rule_value
-                    );
-                    println!("Violated rules, returning zero. Counter: {:?}", counter);
-                    println!("");
+                if parsed_value > *rule_value {
+                    println!("Violated rules, returning zero");
                     return &0;
                 }
             }
-            // println!("{:?}", set);
         }
-
-        // println!("counter {:?}", counter);
 
         &self.id
     }
