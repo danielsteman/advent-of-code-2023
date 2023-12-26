@@ -1,3 +1,4 @@
+from collections import defaultdict
 from dataclasses import dataclass
 
 
@@ -5,10 +6,13 @@ from dataclasses import dataclass
 class Result:
     points: int
     count_winning_numbers: int
+    card_number: int
 
 
 def get_points(s: str) -> Result:
     temp = s.split(":")[1].strip().split("|")
+
+    card_number = int(s.split(":")[0].split(" ")[-1])
 
     my_numbers = temp[0].strip().split(" ")
     my_numbers = [i for i in my_numbers if i]
@@ -20,14 +24,15 @@ def get_points(s: str) -> Result:
 
     count_winning_numbers = len(my_winning_numbers)
     if count_winning_numbers == 0:
-        return Result(0, 0)
+        return Result(0, 0, card_number)
 
     points = 2 ** (count_winning_numbers - 1)
 
-    return Result(points, count_winning_numbers)
+    return Result(points, count_winning_numbers, card_number)
 
 
 total_points = 0
+card_counter = {k: 1 for k in range(1, 200)}
 
 with open("input.txt", "r") as file:
     data = file.readlines()
@@ -35,8 +40,13 @@ with open("input.txt", "r") as file:
         try:
             result = get_points(data[i])
             total_points += result.points
+            if result.count_winning_numbers != 0:
+                for i in range(
+                    result.card_number + 1, result.count_winning_numbers + 1
+                ):
+                    card_counter[i] += 1
         except Exception as e:
             print(f"error row: {data[i]}. With error: {e}")
 
-
+print(card_counter)
 print(total_points)
