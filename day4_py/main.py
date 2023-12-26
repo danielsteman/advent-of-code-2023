@@ -8,6 +8,9 @@ class Result:
     count_winning_numbers: int
     card_number: int
 
+    def __repr__(self):
+        return f"card_number: {self.card_number}, winning_numbers: {self.count_winning_numbers}"
+
 
 def get_points(s: str) -> Result:
     temp = s.split(":")[1].strip().split("|")
@@ -32,18 +35,25 @@ def get_points(s: str) -> Result:
 
 
 total_points = 0
-card_counter = {k: 1 for k in range(1, 200)}
+
+card_counter = defaultdict(int)
+for i in range(1, 200):
+    card_counter[i] = 1
 
 with open("input.txt", "r") as file:
     data = file.readlines()
     for i in range(len(data)):
         try:
             result = get_points(data[i])
+            print(result)
+
             total_points += result.points
             if result.count_winning_numbers != 0:
                 for i in range(
-                    result.card_number + 1, result.count_winning_numbers + 1
+                    result.card_number + 1,
+                    result.card_number + 1 + result.count_winning_numbers + 1,
                 ):
+                    print(i)
                     card_counter[i] += 1
         except Exception as e:
             print(f"error row: {data[i]}. With error: {e}")
